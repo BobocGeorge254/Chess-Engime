@@ -164,6 +164,14 @@ ostream& operator << (ostream& out, Piece &piece) {
     return out ;
 }
 
+
+pair <int, int> GetKingPosition (string color);
+vector <Piece*  > WhitePieces ;
+vector <Piece*> BlackPieces ;
+bool Check(string,int,int) ;
+
+
+/// PAWN-----------------------------------------------------------------
 class Pawn : public Piece {
 public :
     Pawn(string,int,int,bool) ;
@@ -211,7 +219,10 @@ void Pawn::GetLegalMoves() {
 
     this -> LegalMoves = LegalMoves ;
 }
+/// PAWN-----------------------------------------------------------------
 
+
+/// KNIGHT-----------------------------------------------------------------
 int dx[] = {-2,-2,-1,-1,1,1,2,2} ;
 int dy[] = {1,-1,2,-2,2,-2,1,-1};
 class Knight : public Piece {
@@ -239,6 +250,8 @@ void Knight::GetLegalMoves() {
     }
     this -> LegalMoves = LegalMoves ;
 }
+/// KNIGHT-----------------------------------------------------------------
+
 
 class Bishop : public Piece {
 public :
@@ -558,9 +571,7 @@ King::King(string color, int positionX , int positionY, bool moved = false) {
     this -> positionY = positionY ;
 }
 
-vector <Piece*  > WhitePieces ;
-vector <Piece*> BlackPieces ;
-bool Check(string,int,int) ;
+
 
 void King::GetLegalMoves() {
     unordered_set < pair < int , int >, pair_hash > LegalMoves = {} ;
@@ -602,8 +613,12 @@ void King::GetLegalMoves() {
 }
 
 
-bool Check ( string color , int dx, int dy ) {
+bool Check ( string color ) {
+
     if ( color == "White" ) {
+        pair <int, int> aux = GetKingPosition("White");
+        int dx = aux.first;
+        int dy = aux.second;
         for ( int i = 0 ; i < BlackPieces.size() ; ++i ) {
             BlackPieces[i] -> GetLegalMoves() ;
             if (BlackPieces[i] -> LegalMoves.find({dx, dy}) != BlackPieces[i] -> LegalMoves.end())
@@ -611,6 +626,9 @@ bool Check ( string color , int dx, int dy ) {
         }
     }
     if ( color == "Black" ) {
+        pair <int, int> aux = GetKingPosition("Black");
+        int dx = aux.first;
+        int dy = aux.second;
         for ( int i = 0 ; i < WhitePieces.size() ; ++i ) {
                 WhitePieces[i] -> GetLegalMoves() ;
                 if (WhitePieces[i] -> LegalMoves.find({dx, dy}) != WhitePieces[i] -> LegalMoves.end())
@@ -619,6 +637,25 @@ bool Check ( string color , int dx, int dy ) {
     }
     return false ;
 }
+
+pair <int, int> GetKingPosition (string color)
+{
+    if (color == "White")
+    {
+        for (auto i : WhitePieces)
+            if (i -> name == "King")
+                return {i -> positionX, i -> positionY};
+    }
+    else
+    {
+        for (auto i : BlackPieces)
+            if (i -> name == "King")
+                return {i -> positionX, i -> positionY};
+
+    }
+    return {0, 0};
+}
+
 
 void CreateBoard() {
     for ( int j = 1 ; j <= 8 ; ++j ) {
