@@ -166,8 +166,8 @@ ostream& operator << (ostream& out, Piece &piece) {
 
 
 pair <int, int> GetKingPosition (string color);
-vector <Piece*  > WhitePieces ;
-vector <Piece*> BlackPieces ;
+unordered_set <Piece*  > WhitePieces ;
+unordered_set <Piece*> BlackPieces ;
 bool Check(string,int,int) ;
 
 
@@ -578,19 +578,19 @@ void King::GetLegalMoves() {
     int dx[] = {0,0,-1,-1,-1,1,1,1} ;
     int dy[] = {1,-1,0,1,-1,0,1,-1} ;
     if ( color == "White") {
-        for (int i = 0; i < BlackPieces.size(); ++i) {
-            BlackPieces[i]->GetLegalMoves();
+        for (auto CurrBlackPiece : BlackPieces) {
+            CurrBlackPiece ->GetLegalMoves();
             unordered_set < pair < int , int >, pair_hash > :: iterator it ;
-            for (it = (BlackPieces[i]->LegalMoves).begin(); it != (BlackPieces[i]->LegalMoves).end(); ++it)
+            for (it = (CurrBlackPiece -> LegalMoves).begin(); it != (CurrBlackPiece -> LegalMoves).end(); ++it)
                 LegalMoves.insert(make_pair(it->first, it->second));
 
         }
     }
     if ( color == "Black") {
-        for (int i = 0; i < WhitePieces.size(); ++i) {
-            WhitePieces[i]->GetLegalMoves();
+        for (auto CurrWhitePiece : WhitePieces) {
+            CurrWhitePiece->GetLegalMoves();
             unordered_set < pair < int , int >, pair_hash > :: iterator it ;
-            for (it = (WhitePieces[i]->LegalMoves).begin(); it != (WhitePieces[i]->LegalMoves).end(); ++it)
+            for (it = (CurrWhitePiece->LegalMoves).begin(); it != (CurrWhitePiece->LegalMoves).end(); ++it)
                 LegalMoves.insert(make_pair(it->first, it->second));
         }
     }
@@ -619,9 +619,9 @@ bool Check ( string color ) {
         pair <int, int> aux = GetKingPosition("White");
         int dx = aux.first;
         int dy = aux.second;
-        for ( int i = 0 ; i < BlackPieces.size() ; ++i ) {
-            BlackPieces[i] -> GetLegalMoves() ;
-            if (BlackPieces[i] -> LegalMoves.find({dx, dy}) != BlackPieces[i] -> LegalMoves.end())
+        for (auto CurrBlackPiece : BlackPieces) {
+            CurrBlackPiece -> GetLegalMoves() ;
+            if (CurrBlackPiece -> LegalMoves.find({dx, dy}) != CurrBlackPiece -> LegalMoves.end())
                 return true;
         }
     }
@@ -629,9 +629,9 @@ bool Check ( string color ) {
         pair <int, int> aux = GetKingPosition("Black");
         int dx = aux.first;
         int dy = aux.second;
-        for ( int i = 0 ; i < WhitePieces.size() ; ++i ) {
-                WhitePieces[i] -> GetLegalMoves() ;
-                if (WhitePieces[i] -> LegalMoves.find({dx, dy}) != WhitePieces[i] -> LegalMoves.end())
+        for ( auto CurrWhitePiece : WhitePieces) {
+                CurrWhitePiece -> GetLegalMoves() ;
+                if (CurrWhitePiece -> LegalMoves.find({dx, dy}) != CurrWhitePiece -> LegalMoves.end())
                     return true;
         }
     }
@@ -642,15 +642,15 @@ pair <int, int> GetKingPosition (string color)
 {
     if (color == "White")
     {
-        for (auto i : WhitePieces)
-            if (i -> name == "King")
-                return {i -> positionX, i -> positionY};
+        for (auto CurrWhitePiece : WhitePieces)
+            if (CurrWhitePiece -> name == "King")
+                return {CurrWhitePiece -> positionX, CurrWhitePiece -> positionY};
     }
     else
     {
-        for (auto i : BlackPieces)
-            if (i -> name == "King")
-                return {i -> positionX, i -> positionY};
+        for (auto CurrBlackPiece : BlackPieces)
+            if (CurrBlackPiece -> name == "King")
+                return {CurrBlackPiece -> positionX, CurrBlackPiece -> positionY};
 
     }
     return {0, 0};
@@ -659,25 +659,25 @@ pair <int, int> GetKingPosition (string color)
 
 void CreateBoard() {
     for ( int j = 1 ; j <= 8 ; ++j ) {
-        WhitePieces.push_back(Board[2][j] = new Pawn("White",2,j)) ;
-        BlackPieces.push_back(Board[7][j] = new Pawn("Black",7,j));
+        WhitePieces.insert(Board[2][j] = new Pawn("White",2,j)) ;
+        BlackPieces.insert(Board[7][j] = new Pawn("Black",7,j));
     }
-    WhitePieces.push_back(Board[1][1] = new Rook("White",1,1) );
-    WhitePieces.push_back(Board[1][8] = new Rook("White",1,8) );
-    BlackPieces.push_back(Board[8][1] = new Rook ("Black",8,1) ) ;
-    BlackPieces.push_back(Board[8][8] = new Rook("Black",8,8) );
-    WhitePieces.push_back(Board[1][2] = new Knight("White",1,2) );
-    WhitePieces.push_back(Board[1][7] = new Knight("White",1,7) ) ;
-    BlackPieces.push_back(Board[8][2] = new Knight("Black",8,2) );
-    BlackPieces.push_back(Board[8][7] = new Knight("Black",8,7) );
-    WhitePieces.push_back(Board[1][3] = new Bishop("White",1,3) );
-    WhitePieces.push_back(Board[1][6] = new Bishop("White",1,6) );
-    BlackPieces.push_back(Board[8][3] = new Bishop("Black",8,3) ) ;
-    BlackPieces.push_back(Board[8][6] = new Bishop("Black",8,6) );
-    WhitePieces.push_back(Board[1][4] = new King("White",1,4) );
-    BlackPieces.push_back(Board[8][4] = new King("Black",8,4) ) ;
-    WhitePieces.push_back(Board[1][5] = new Queen("White",1,5) );
-    BlackPieces.push_back(Board[8][5] = new Queen("Black",8,5) );
+    WhitePieces.insert(Board[1][1] = new Rook("White",1,1) );
+    WhitePieces.insert(Board[1][8] = new Rook("White",1,8) );
+    BlackPieces.insert(Board[8][1] = new Rook ("Black",8,1) ) ;
+    BlackPieces.insert(Board[8][8] = new Rook("Black",8,8) );
+    WhitePieces.insert(Board[1][2] = new Knight("White",1,2) );
+    WhitePieces.insert(Board[1][7] = new Knight("White",1,7) ) ;
+    BlackPieces.insert(Board[8][2] = new Knight("Black",8,2) );
+    BlackPieces.insert(Board[8][7] = new Knight("Black",8,7) );
+    WhitePieces.insert(Board[1][3] = new Bishop("White",1,3) );
+    WhitePieces.insert(Board[1][6] = new Bishop("White",1,6) );
+    BlackPieces.insert(Board[8][3] = new Bishop("Black",8,3) ) ;
+    BlackPieces.insert(Board[8][6] = new Bishop("Black",8,6) );
+    WhitePieces.insert(Board[1][4] = new King("White",1,4) );
+    BlackPieces.insert(Board[8][4] = new King("Black",8,4) ) ;
+    WhitePieces.insert(Board[1][5] = new Queen("White",1,5) );
+    BlackPieces.insert(Board[8][5] = new Queen("Black",8,5) );
     for ( int i = 3 ; i <= 6 ; ++i )
         for ( int j = 1 ; j <= 8 ; ++j )
             Board[i][j] = new Piece() ;
@@ -694,107 +694,107 @@ int Evaluate() {
     int WhiteMaterial = 0 , BlackMaterial = 0 ;
     int PositionFactorWhite = 0, PoistionFactorBlack = 0 ;
     int MatricealPositionWhite = 0 , MatricealPositionBlack = 0 ;
-    for (int i = 0 ; i < WhitePieces.size() ; ++i) {
-        if ( typeid(*WhitePieces[i]) == typeid(Pawn)) {
+    for (auto i : WhitePieces) {
+        if ( typeid(*i) == typeid(Pawn)) {
             WhiteMaterial = WhiteMaterial + 1;
-            WhitePieces[i]->GetLegalMoves();
-            PositionFactorWhite = PositionFactorWhite + 1 * (WhitePieces[i]->LegalMoves).size();
-            MatricealPositionWhite += WhitePawnMatrix[WhitePieces[i] -> positionX][WhitePieces[i] -> positionY] ;
+            i->GetLegalMoves();
+            PositionFactorWhite = PositionFactorWhite + 1 * (i->LegalMoves).size();
+            MatricealPositionWhite += WhitePawnMatrix[i -> positionX][i -> positionY] ;
             ///set < pair < int , int > > :: iterator it ;
             unordered_set < pair < int , int >, pair_hash > :: iterator it ;
-            for ( it = (WhitePieces[i]->LegalMoves).begin() ; it != (WhitePieces[i]->LegalMoves).end(); ++it )
+            for ( it = (i->LegalMoves).begin() ; it != (i->LegalMoves).end(); ++it )
                 Targets[it -> first][it -> second] = Targets[it -> first][it -> second] + 1;
         }
-        if ( typeid(*WhitePieces[i]) == typeid(Knight)) {
+        if ( typeid(*i) == typeid(Knight)) {
             WhiteMaterial = WhiteMaterial + 3;
-            WhitePieces[i]->GetLegalMoves();
-            PositionFactorWhite = PositionFactorWhite + WhitePieces[i]->LegalMoves.size();
-            MatricealPositionWhite += WhiteKnightMatrix[WhitePieces[i] -> positionX][WhitePieces[i] -> positionY] ;
+            i->GetLegalMoves();
+            PositionFactorWhite = PositionFactorWhite + i->LegalMoves.size();
+            MatricealPositionWhite += WhiteKnightMatrix[i -> positionX][i -> positionY] ;
             ///set < pair < int , int > > :: iterator it ;
             unordered_set < pair < int , int >, pair_hash > :: iterator it ;
-            for ( it = (WhitePieces[i]->LegalMoves).begin() ; it != (WhitePieces[i]->LegalMoves).end(); ++it )
+            for ( it = (i->LegalMoves).begin() ; it != (i->LegalMoves).end(); ++it )
                 Targets[it -> first][it -> second] = Targets[it -> first][it -> second] + 1;
         }
-        if ( typeid(*WhitePieces[i]) == typeid(Bishop)) {
+        if ( typeid(*i) == typeid(Bishop)) {
             WhiteMaterial = WhiteMaterial + 3;
-            WhitePieces[i]->GetLegalMoves();
-            PositionFactorWhite = PositionFactorWhite + WhitePieces[i]->LegalMoves.size();
-            MatricealPositionWhite += WhiteBishopMatrix[WhitePieces[i] -> positionX][WhitePieces[i] -> positionY] ;
+            i->GetLegalMoves();
+            PositionFactorWhite = PositionFactorWhite + i->LegalMoves.size();
+            MatricealPositionWhite += WhiteBishopMatrix[i -> positionX][i -> positionY] ;
             ///set < pair < int , int > > :: iterator it ;
             unordered_set < pair < int , int >, pair_hash > :: iterator it ;
-            for ( it = (WhitePieces[i]->LegalMoves).begin() ; it != (WhitePieces[i]->LegalMoves).end(); ++it )
+            for ( it = (i->LegalMoves).begin() ; it != (i->LegalMoves).end(); ++it )
                 Targets[it -> first][it -> second] = Targets[it -> first][it -> second] + 1;
         }
-        if ( typeid(*WhitePieces[i]) == typeid(Rook)) {
+        if ( typeid(*i) == typeid(Rook)) {
             WhiteMaterial = WhiteMaterial + 5;
-            WhitePieces[i]->GetLegalMoves();
-            PositionFactorWhite = PositionFactorWhite + WhitePieces[i]->LegalMoves.size();
-            MatricealPositionWhite += WhiteRookMatrix[WhitePieces[i] -> positionX][WhitePieces[i] -> positionY] ;
+            i->GetLegalMoves();
+            PositionFactorWhite = PositionFactorWhite + i->LegalMoves.size();
+            MatricealPositionWhite += WhiteRookMatrix[i -> positionX][i -> positionY] ;
             ///set < pair < int , int > > :: iterator it ;
             unordered_set < pair < int , int >, pair_hash > :: iterator it ;
-            for ( it = (WhitePieces[i]->LegalMoves).begin() ; it != (WhitePieces[i]->LegalMoves).end(); ++it )
+            for ( it = (i->LegalMoves).begin() ; it != (i->LegalMoves).end(); ++it )
                 Targets[it -> first][it -> second] = Targets[it -> first][it -> second] + 1;
         }
-        if ( typeid(*WhitePieces[i]) == typeid(Queen)) {
+        if ( typeid(*i) == typeid(Queen)) {
             WhiteMaterial = WhiteMaterial + 9;
-            WhitePieces[i]->GetLegalMoves();
-            PositionFactorWhite = PositionFactorWhite + WhitePieces[i]->LegalMoves.size();
-            MatricealPositionWhite += WhiteQueenMatrix[WhitePieces[i] -> positionX][WhitePieces[i] -> positionY] ;
+            i->GetLegalMoves();
+            PositionFactorWhite = PositionFactorWhite + i->LegalMoves.size();
+            MatricealPositionWhite += WhiteQueenMatrix[i -> positionX][i -> positionY] ;
             ///set < pair < int , int > > :: iterator it ;
             unordered_set < pair < int , int >, pair_hash > :: iterator it ;
-            for ( it = (WhitePieces[i]->LegalMoves).begin() ; it != (WhitePieces[i]->LegalMoves).end(); ++it )
+            for ( it = (i->LegalMoves).begin() ; it != (i->LegalMoves).end(); ++it )
                 Targets[it -> first][it -> second] = Targets[it -> first][it -> second] + 1;
         }
     }
-    for (int i = 0 ; i < BlackPieces.size() ; ++i) {
-        if ( typeid(*BlackPieces[i]) == typeid(Pawn)) {
+    for (auto CurrBlackPiece : BlackPieces) {
+        if ( typeid(*CurrBlackPiece) == typeid(Pawn)) {
             BlackMaterial = BlackMaterial + 1;
-            BlackPieces[i]->GetLegalMoves();
-            PoistionFactorBlack = PoistionFactorBlack + BlackPieces[i]->LegalMoves.size();
-            MatricealPositionBlack += BlackQueenMatrix[BlackPieces[i] -> positionX][BlackPieces[i] -> positionY] ;
+            CurrBlackPiece->GetLegalMoves();
+            PoistionFactorBlack = PoistionFactorBlack + CurrBlackPiece->LegalMoves.size();
+            MatricealPositionBlack += BlackQueenMatrix[CurrBlackPiece -> positionX][CurrBlackPiece -> positionY] ;
             ///set < pair < int , int > > :: iterator it ;
             unordered_set < pair < int , int >, pair_hash > :: iterator it ;
-            for ( it = (BlackPieces[i]->LegalMoves).begin() ; it != (BlackPieces[i]->LegalMoves).end(); ++it )
+            for ( it = (CurrBlackPiece->LegalMoves).begin() ; it != (CurrBlackPiece->LegalMoves).end(); ++it )
                 Targets[it -> first][it -> second] = Targets[it -> first][it -> second] - 1;
         }
-        if ( typeid(*BlackPieces[i]) == typeid(Knight)) {
+        if ( typeid(*CurrBlackPiece) == typeid(Knight)) {
             BlackMaterial = BlackMaterial + 3;
-            BlackPieces[i]->GetLegalMoves();
-            PoistionFactorBlack = PoistionFactorBlack + BlackPieces[i]->LegalMoves.size();
-            MatricealPositionBlack += BlackQueenMatrix[BlackPieces[i] -> positionX][BlackPieces[i] -> positionY] ;
+            CurrBlackPiece->GetLegalMoves();
+            PoistionFactorBlack = PoistionFactorBlack + CurrBlackPiece->LegalMoves.size();
+            MatricealPositionBlack += BlackQueenMatrix[CurrBlackPiece -> positionX][CurrBlackPiece -> positionY] ;
             ///set < pair < int , int > > :: iterator it ;
             unordered_set < pair < int , int >, pair_hash > :: iterator it ;
-            for ( it = (BlackPieces[i]->LegalMoves).begin() ; it != (BlackPieces[i]->LegalMoves).end(); ++it )
+            for ( it = (CurrBlackPiece->LegalMoves).begin() ; it != (CurrBlackPiece->LegalMoves).end(); ++it )
                 Targets[it -> first][it -> second] = Targets[it -> first][it -> second] - 1;
         }
-        if ( typeid(*BlackPieces[i]) == typeid(Bishop)) {
+        if ( typeid(*CurrBlackPiece) == typeid(Bishop)) {
             BlackMaterial = BlackMaterial + 3;
-            BlackPieces[i]->GetLegalMoves();
-            PoistionFactorBlack = PoistionFactorBlack + BlackPieces[i]->LegalMoves.size();
-            MatricealPositionBlack += BlackQueenMatrix[BlackPieces[i] -> positionX][BlackPieces[i] -> positionY] ;
+            CurrBlackPiece->GetLegalMoves();
+            PoistionFactorBlack = PoistionFactorBlack + CurrBlackPiece->LegalMoves.size();
+            MatricealPositionBlack += BlackQueenMatrix[CurrBlackPiece -> positionX][CurrBlackPiece -> positionY] ;
             ///set < pair < int , int > > :: iterator it ;
             unordered_set < pair < int , int >, pair_hash > :: iterator it ;
-            for ( it = (BlackPieces[i]->LegalMoves).begin() ; it != (BlackPieces[i]->LegalMoves).end(); ++it )
+            for ( it = (CurrBlackPiece->LegalMoves).begin() ; it != (CurrBlackPiece->LegalMoves).end(); ++it )
                 Targets[it -> first][it -> second] = Targets[it -> first][it -> second] - 1;
         }
-        if ( typeid(*BlackPieces[i]) == typeid(Rook)) {
+        if ( typeid(*CurrBlackPiece) == typeid(Rook)) {
             BlackMaterial = BlackMaterial + 5;
-            BlackPieces[i]->GetLegalMoves();
-            PoistionFactorBlack = PoistionFactorBlack + BlackPieces[i]->LegalMoves.size();
-            MatricealPositionBlack += BlackQueenMatrix[BlackPieces[i] -> positionX][BlackPieces[i] -> positionY] ;
+            CurrBlackPiece->GetLegalMoves();
+            PoistionFactorBlack = PoistionFactorBlack + CurrBlackPiece->LegalMoves.size();
+            MatricealPositionBlack += BlackQueenMatrix[CurrBlackPiece -> positionX][CurrBlackPiece -> positionY] ;
             ///set < pair < int , int > > :: iterator it ;
             unordered_set < pair < int , int >, pair_hash > :: iterator it ;
-            for ( it = (BlackPieces[i]->LegalMoves).begin() ; it != (BlackPieces[i]->LegalMoves).end(); ++it )
+            for ( it = (CurrBlackPiece->LegalMoves).begin() ; it != (CurrBlackPiece->LegalMoves).end(); ++it )
                 Targets[it -> first][it -> second] = Targets[it -> first][it -> second] - 1;
         }
-        if ( typeid(*BlackPieces[i]) == typeid(Queen)) {
+        if ( typeid(*CurrBlackPiece) == typeid(Queen)) {
             BlackMaterial = BlackMaterial + 9;
-            BlackPieces[i]->GetLegalMoves();
-            PoistionFactorBlack = PoistionFactorBlack + BlackPieces[i]->LegalMoves.size();
-            MatricealPositionBlack += BlackQueenMatrix[BlackPieces[i] -> positionX][BlackPieces[i] -> positionY] ;
+            CurrBlackPiece->GetLegalMoves();
+            PoistionFactorBlack = PoistionFactorBlack + CurrBlackPiece->LegalMoves.size();
+            MatricealPositionBlack += BlackQueenMatrix[CurrBlackPiece -> positionX][CurrBlackPiece -> positionY] ;
             ///set < pair < int , int > > :: iterator it ;
             unordered_set < pair < int , int >, pair_hash > :: iterator it ;
-            for ( it = (BlackPieces[i]->LegalMoves).begin() ; it != (BlackPieces[i]->LegalMoves).end(); ++it )
+            for ( it = (CurrBlackPiece->LegalMoves).begin() ; it != (CurrBlackPiece->LegalMoves).end(); ++it )
                 Targets[it -> first][it -> second] = Targets[it -> first][it -> second] - 1;
         }
     }
@@ -839,16 +839,16 @@ int Evaluate() {
     float KingSafetyBlack = 0 ;
     int dx[] = {0,0,-1,-1,-1,1,1,1} ;
     int dy[] = {1,-1,0,1,-1,0,1,-1} ;
-    for ( int i = 0 ; i < WhitePieces.size() ; ++i ) {
-        if ( typeid(*WhitePieces[i]) == typeid(King) ) {
-            dxWhite = WhitePieces[i] -> positionX ;
-            dyWhite = WhitePieces[i] -> positionY ;
+    for ( auto CurrWhitePiece : WhitePieces) {
+        if ( typeid(*CurrWhitePiece) == typeid(King) ) {
+            dxWhite = CurrWhitePiece -> positionX ;
+            dyWhite = CurrWhitePiece -> positionY ;
         }
     }
-    for ( int i = 0 ; i < BlackPieces.size() ; ++i ) {
-        if ( typeid(*BlackPieces[i]) == typeid(King) ) {
-            dxBlack = BlackPieces[i] -> positionX ;
-            dyBlack = BlackPieces[i] -> positionY ;
+    for ( auto CurrBlackPiece : BlackPieces) {
+        if ( typeid(*CurrBlackPiece) == typeid(King) ) {
+            dxBlack = CurrBlackPiece -> positionX ;
+            dyBlack = CurrBlackPiece -> positionY ;
         }
     }
     for ( int i = 0 ; i < 8 ; ++i ) {
@@ -883,85 +883,85 @@ int NextMove (string color, int depth, int alpha, int beta, bool maximazingPlaye
     pair < pair < int , int > , pair < int , int > > bestMove ;
     if ( maximazingPlayer == false ) {
         set<pair<pair<int, int>, pair<int, int> > > LegalMoves = {};
-        for (int i = 0; i < BlackPieces.size(); ++i) {
-            if (typeid(*BlackPieces[i]) == typeid(Pawn)) {
-                BlackPieces[i]->GetLegalMoves();
+        for (auto CurrBlackPiece : BlackPieces ) {
+            if (typeid(*CurrBlackPiece) == typeid(Pawn)) {
+                CurrBlackPiece->GetLegalMoves();
                 unordered_set<pair<int, int>, pair_hash >::iterator it;
-                for (it = (BlackPieces[i]->LegalMoves).begin(); it != (BlackPieces[i]->LegalMoves).end(); ++it)
-                    BlackLegalMoves.insert(make_pair(make_pair(BlackPieces[i]->positionX, BlackPieces[i]->positionY),
+                for (it = (CurrBlackPiece->LegalMoves).begin(); it != (CurrBlackPiece->LegalMoves).end(); ++it)
+                    BlackLegalMoves.insert(make_pair(make_pair(CurrBlackPiece->positionX, CurrBlackPiece->positionY),
                                                      make_pair(it->first, it->second)));
             }
-            if (typeid(*BlackPieces[i]) == typeid(Knight)) {
-                BlackPieces[i]->GetLegalMoves();
+            if (typeid(*CurrBlackPiece) == typeid(Knight)) {
+                CurrBlackPiece->GetLegalMoves();
                 unordered_set<pair<int, int>, pair_hash >::iterator it;
-                for (it = (BlackPieces[i]->LegalMoves).begin(); it != (BlackPieces[i]->LegalMoves).end(); ++it)
-                    BlackLegalMoves.insert(make_pair(make_pair(BlackPieces[i]->positionX, BlackPieces[i]->positionY),
+                for (it = (CurrBlackPiece->LegalMoves).begin(); it != (CurrBlackPiece->LegalMoves).end(); ++it)
+                    BlackLegalMoves.insert(make_pair(make_pair(CurrBlackPiece->positionX, CurrBlackPiece->positionY),
                                                      make_pair(it->first, it->second)));
             }
-            if (typeid(*BlackPieces[i]) == typeid(Bishop)) {
-                BlackPieces[i]->GetLegalMoves();
+            if (typeid(*CurrBlackPiece) == typeid(Bishop)) {
+                CurrBlackPiece->GetLegalMoves();
                 unordered_set<pair<int, int>, pair_hash >::iterator it;
-                for (it = (BlackPieces[i]->LegalMoves).begin(); it != (BlackPieces[i]->LegalMoves).end(); ++it)
-                    BlackLegalMoves.insert(make_pair(make_pair(BlackPieces[i]->positionX, BlackPieces[i]->positionY),
+                for (it = (CurrBlackPiece->LegalMoves).begin(); it != (CurrBlackPiece->LegalMoves).end(); ++it)
+                    BlackLegalMoves.insert(make_pair(make_pair(CurrBlackPiece->positionX, CurrBlackPiece->positionY),
                                                      make_pair(it->first, it->second)));
             }
-            if (typeid(*BlackPieces[i]) == typeid(Rook)) {
-                BlackPieces[i]->GetLegalMoves();
+            if (typeid(*CurrBlackPiece) == typeid(Rook)) {
+                CurrBlackPiece->GetLegalMoves();
                 unordered_set<pair<int, int>, pair_hash >::iterator it;
-                for (it = (BlackPieces[i]->LegalMoves).begin(); it != (BlackPieces[i]->LegalMoves).end(); ++it)
-                    BlackLegalMoves.insert(make_pair(make_pair(BlackPieces[i]->positionX, BlackPieces[i]->positionY),
+                for (it = (CurrBlackPiece->LegalMoves).begin(); it != (CurrBlackPiece->LegalMoves).end(); ++it)
+                    BlackLegalMoves.insert(make_pair(make_pair(CurrBlackPiece->positionX, CurrBlackPiece->positionY),
                                                      make_pair(it->first, it->second)));
             }
-            if (typeid(*BlackPieces[i]) == typeid(Queen)) {
-                BlackPieces[i]->GetLegalMoves();
+            if (typeid(*CurrBlackPiece) == typeid(Queen)) {
+                CurrBlackPiece->GetLegalMoves();
                 unordered_set<pair<int, int>, pair_hash >::iterator it;
-                for (it = (BlackPieces[i]->LegalMoves).begin(); it != (BlackPieces[i]->LegalMoves).end(); ++it)
-                    BlackLegalMoves.insert(make_pair(make_pair(BlackPieces[i]->positionX, BlackPieces[i]->positionY),
+                for (it = (CurrBlackPiece->LegalMoves).begin(); it != (CurrBlackPiece->LegalMoves).end(); ++it)
+                    BlackLegalMoves.insert(make_pair(make_pair(CurrBlackPiece->positionX, CurrBlackPiece->positionY),
                                                      make_pair(it->first, it->second)));
             }
         }
     }
     if (maximazingPlayer == true) {
         set<pair<pair<int, int>, pair<int, int> > > LegalMoves = {};
-        for (int i = 0; i < WhitePieces.size(); ++i) {
-            if (typeid(*WhitePieces[i]) == typeid(Pawn)) {
-                WhitePieces[i]->GetLegalMoves();
+        for (auto CurrWhitePiece : WhitePieces) {
+            if (typeid(*CurrWhitePiece) == typeid(Pawn)) {
+                CurrWhitePiece->GetLegalMoves();
                 unordered_set<pair<int, int>, pair_hash >::iterator it;
-                for (it = (WhitePieces[i]->LegalMoves).begin(); it != (WhitePieces[i]->LegalMoves).end(); ++it)
-                    WhiteLegalMoves.insert(make_pair(make_pair(WhitePieces[i]->positionX, WhitePieces[i]->positionY),
+                for (it = (CurrWhitePiece->LegalMoves).begin(); it != (CurrWhitePiece->LegalMoves).end(); ++it)
+                    WhiteLegalMoves.insert(make_pair(make_pair(CurrWhitePiece->positionX, CurrWhitePiece->positionY),
                                                 make_pair(it->first, it->second)));
             }
-            if (typeid(*WhitePieces[i]) == typeid(Knight)) {
-                WhitePieces[i]->GetLegalMoves();
+            if (typeid(*CurrWhitePiece) == typeid(Knight)) {
+                CurrWhitePiece->GetLegalMoves();
                 unordered_set<pair<int, int>, pair_hash >::iterator it;
-                for (it = (WhitePieces[i]->LegalMoves).begin(); it != (WhitePieces[i]->LegalMoves).end(); ++it)
-                    WhiteLegalMoves.insert(make_pair(make_pair(WhitePieces[i]->positionX, WhitePieces[i]->positionY),
+                for (it = (CurrWhitePiece->LegalMoves).begin(); it != (CurrWhitePiece->LegalMoves).end(); ++it)
+                    WhiteLegalMoves.insert(make_pair(make_pair(CurrWhitePiece->positionX, CurrWhitePiece->positionY),
                                                 make_pair(it->first, it->second)));
             }
-            if (typeid(*WhitePieces[i]) == typeid(Bishop)) {
-                WhitePieces[i]->GetLegalMoves();
+            if (typeid(*CurrWhitePiece) == typeid(Bishop)) {
+                CurrWhitePiece->GetLegalMoves();
                 unordered_set<pair<int, int>, pair_hash >::iterator it;
-                for (it = (WhitePieces[i]->LegalMoves).begin(); it != (WhitePieces[i]->LegalMoves).end(); ++it)
-                    WhiteLegalMoves.insert(make_pair(make_pair(WhitePieces[i]->positionX, WhitePieces[i]->positionY),
+                for (it = (CurrWhitePiece->LegalMoves).begin(); it != (CurrWhitePiece->LegalMoves).end(); ++it)
+                    WhiteLegalMoves.insert(make_pair(make_pair(CurrWhitePiece->positionX, CurrWhitePiece->positionY),
                                                 make_pair(it->first, it->second)));
             }
-            if (typeid(*WhitePieces[i]) == typeid(Rook)) {
-                WhitePieces[i]->GetLegalMoves();
+            if (typeid(*CurrWhitePiece) == typeid(Rook)) {
+                CurrWhitePiece->GetLegalMoves();
                 unordered_set<pair<int, int>, pair_hash >::iterator it;
-                for (it = (WhitePieces[i]->LegalMoves).begin(); it != (WhitePieces[i]->LegalMoves).end(); ++it)
-                    WhiteLegalMoves.insert(make_pair(make_pair(WhitePieces[i]->positionX, WhitePieces[i]->positionY),
+                for (it = (CurrWhitePiece->LegalMoves).begin(); it != (CurrWhitePiece->LegalMoves).end(); ++it)
+                    WhiteLegalMoves.insert(make_pair(make_pair(CurrWhitePiece->positionX, CurrWhitePiece->positionY),
                                                 make_pair(it->first, it->second)));
             }
-            if (typeid(*WhitePieces[i]) == typeid(Queen)) {
-                WhitePieces[i]->GetLegalMoves();
+            if (typeid(*CurrWhitePiece) == typeid(Queen)) {
+                CurrWhitePiece->GetLegalMoves();
                 unordered_set<pair<int, int>, pair_hash >::iterator it;
-                for (it = (WhitePieces[i]->LegalMoves).begin(); it != (WhitePieces[i]->LegalMoves).end(); ++it)
-                    WhiteLegalMoves.insert(make_pair(make_pair(WhitePieces[i]->positionX, WhitePieces[i]->positionY),
+                for (it = (CurrWhitePiece->LegalMoves).begin(); it != (CurrWhitePiece->LegalMoves).end(); ++it)
+                    WhiteLegalMoves.insert(make_pair(make_pair(CurrWhitePiece->positionX, CurrWhitePiece->positionY),
                                                 make_pair(it->first, it->second)));
             }
         }
     }
-    if ( maximazingPlayer == true ) {
+    if ( maximazingPlayer == false ) {
         int maxEvaluation = -99999 ;
         set < pair < pair < int , int > , pair < int , int > > > :: iterator it ;
         for ( it = BlackLegalMoves.begin() ; it != BlackLegalMoves.end() ; ++it ) {
@@ -970,15 +970,28 @@ int NextMove (string color, int depth, int alpha, int beta, bool maximazingPlaye
             int stopx = (it -> second).first ;
             int stopy = (it -> second).second;
             ///Make a move
-            Piece *save = Board[startx][starty] ;
+            Piece *save1 = Board[startx][starty], *save2 = nullptr, *NewPiece = nullptr;
+            NewPiece = save1;
+            NewPiece -> positionX = stopx;
+            NewPiece -> positionY = stopy;
+            if (Board[stopx][stopy] == nullptr)
+                Board[stopx][stopy] = new Piece;
+            else save2 = Board[stopx][stopy];
+            BlackPieces.erase(Board[startx][starty] );
+            BlackPieces.insert(NewPiece);
             Board[stopx][stopy] = Board[startx][starty] ;
             Board[startx][starty] = nullptr ;
+            if (save2 != nullptr && WhitePieces.find(save2) != WhitePieces.end())
+                    WhitePieces.erase(save2);
             ///Evaluate
             int currentEvaluation = NextMove(color,depth - 1, alpha, beta,false) ;
             ///Undo the move
-            Board[startx][starty] = save ;
-            Board[stopx][stopy] = nullptr ;
-
+            Board[startx][starty] = save1;
+            Board[stopx][stopy] = save2;
+            BlackPieces.insert(save1);
+            BlackPieces.erase(NewPiece);
+            if (save2 != nullptr)
+                WhitePieces.insert(save2);
             if ( currentEvaluation > maxEvaluation ) {
                 maxEvaluation = currentEvaluation ;
                 bestMove = make_pair(make_pair(startx,starty),make_pair(stopx,stopy)) ;
@@ -998,14 +1011,28 @@ int NextMove (string color, int depth, int alpha, int beta, bool maximazingPlaye
             int stopx = (it -> second).first ;
             int stopy = (it -> second).second;
             ///Make a move
-            Piece *save = Board[startx][starty] ;
+            Piece *save1 = Board[startx][starty], *save2 = nullptr, *NewPiece = nullptr;
+            NewPiece = save1;
+            NewPiece -> positionX = stopx;
+            NewPiece -> positionY = stopy;
+            if (Board[stopx][stopy] == nullptr)
+                Board[stopx][stopy] = new Piece;
+            else save2 = Board[stopx][stopy];
+            WhitePieces.erase(Board[startx][starty] );
+            WhitePieces.insert(NewPiece);
             Board[stopx][stopy] = Board[startx][starty] ;
             Board[startx][starty] = nullptr ;
+            if (save2 != nullptr && BlackPieces.find(save2) != BlackPieces.end())
+                    BlackPieces.erase(save2);
             ///Evaluate
-            int currentEvaluation = NextMove(color,depth - 1, alpha, beta,true) ;
+            int currentEvaluation = NextMove(color,depth - 1, alpha, beta,false) ;
             ///Undo the move
-            Board[startx][starty] = save ;
-            Board[stopx][stopy] = nullptr ;
+            Board[startx][starty] = save1;
+            Board[stopx][stopy] = save2;
+            WhitePieces.insert(save1);
+            WhitePieces.erase(NewPiece);
+            if (save2 != nullptr)
+                BlackPieces.insert(save2);
 
             if ( currentEvaluation < minEvaluation ) {
                 minEvaluation = currentEvaluation ;
@@ -1025,23 +1052,23 @@ pair < int , int > Solve(int depth, string color) {
 }
 
 void CreateBoard1() {
-    BlackPieces.push_back(Board[8][1] = new King("Black",8,1) );
-    BlackPieces.push_back(Board[7][1] = new Rook("Black",7,1) );
-    BlackPieces.push_back(Board[1][3] = new Bishop("Black",1,3) );
-    BlackPieces.push_back(Board[5][7] = new Rook("Black",5,7) );
-    BlackPieces.push_back(Board[5][6] = new Rook("Black",5,6) );
-    BlackPieces.push_back(Board[6][6] = new Rook("Black",6,6) );
+    BlackPieces.insert(Board[8][1] = new King("Black",8,1) );
+    BlackPieces.insert(Board[7][1] = new Rook("Black",7,1) );
+    BlackPieces.insert(Board[1][3] = new Bishop("Black",1,3) );
+    BlackPieces.insert(Board[5][7] = new Rook("Black",5,7) );
+    BlackPieces.insert(Board[5][6] = new Rook("Black",5,6) );
+    BlackPieces.insert(Board[6][6] = new Rook("Black",6,6) );
     ////////////////////////////////////////////////////////////
-    WhitePieces.push_back(Board[1][1] = new Rook("White",1,1) );
-    WhitePieces.push_back(Board[1][4] = new Rook("White",1,4) );
-    WhitePieces.push_back(Board[3][2] = new Bishop("White",3,2) );
-    WhitePieces.push_back(Board[3][3] = new Bishop("White",3,3) );
-    WhitePieces.push_back(Board[3][7] = new Knight("White",3,7) );
-    WhitePieces.push_back(Board[2][5] = new King("White",2,5) );
-    WhitePieces.push_back(Board[4][1] = new Pawn("White",4,1) );
-    WhitePieces.push_back(Board[5][2] = new Pawn("White",5,2) );
-    WhitePieces.push_back(Board[2][7] = new Pawn("White",2,7) );
-    WhitePieces.push_back(Board[2][8] = new Pawn("White",2,8) );
+    WhitePieces.insert(Board[1][1] = new Rook("White",1,1) );
+    WhitePieces.insert(Board[1][4] = new Rook("White",1,4) );
+    WhitePieces.insert(Board[3][2] = new Bishop("White",3,2) );
+    WhitePieces.insert(Board[3][3] = new Bishop("White",3,3) );
+    WhitePieces.insert(Board[3][7] = new Knight("White",3,7) );
+    WhitePieces.insert(Board[2][5] = new King("White",2,5) );
+    WhitePieces.insert(Board[4][1] = new Pawn("White",4,1) );
+    WhitePieces.insert(Board[5][2] = new Pawn("White",5,2) );
+    WhitePieces.insert(Board[2][7] = new Pawn("White",2,7) );
+    WhitePieces.insert(Board[2][8] = new Pawn("White",2,8) );
 
 
 }
